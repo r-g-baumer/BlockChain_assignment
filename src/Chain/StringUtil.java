@@ -70,7 +70,6 @@ public class StringUtil {
     }
 
 
-
     //Applies ECDSA Signature and returns the result ( as bytes ).
     public static byte[] applyECDSASig(PrivateKey privateKey, String input) {
         Signature dsa;
@@ -102,6 +101,37 @@ public class StringUtil {
 
     public static String getStringFromKey(Key key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
+
+    //Tacks in array of transactions and returns a merkle root.
+
+    // In other words, it takes each two transaction ids from the beginning til the end and merges them using Sha256
+    /* To visualise that: imagine the transaction id in the list being hashed with the second:
+     * what happens is end up with the result of that hash as the first element of the arraylist
+     * this one in turn will be hashed with the third transaction id that would have been the third element in the arrayList
+     * but which is the second element now because we merge the two elements bgefore it into one
+     * And it goes on and on until we have one hash
+     */
+
+    // In the end we should have only one element in the treeLayer ArrayList
+    public static String getMerkleRoot(ArrayList<Transaction> transactions) {
+        int count = transactions.size();
+        ArrayList<String> previousTreeLayer = new ArrayList<String>();
+        for(Transaction transaction : transactions) {
+            previousTreeLayer.add(transaction.transactionId);
+        }
+        ArrayList<String> treeLayer = previousTreeLayer;
+        while(count > 1) {
+            treeLayer = new ArrayList<String>();
+            for(int i=1; i < previousTreeLayer.size(); i++) {
+                treeLayer.add(applySha256(previousTreeLayer.get(i-1) + previousTreeLayer.get(i)));
+            }
+            count = treeLayer.size();
+            previousTreeLayer = treeLayer;
+        }
+        // merkleRoot thus exists only when we have hashed all the transaction ids in the treeLayer
+        String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
+        return merkleRoot;
     }
 
 }
