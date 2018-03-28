@@ -1,6 +1,7 @@
 package Chain;
 
 import com.google.gson.GsonBuilder;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.*;
@@ -33,42 +34,9 @@ public class StringUtil {
     }
 
     //Returns difficulty string target, to compare to hash. eg difficulty of 5 will return "00000"
-    public static String getDificultyString(int difficulty) {
+    public static String getDifficultyString(int difficulty) {
         return new String(new char[difficulty]).replace('\0', '0');
     }
-
-    public class Transaction {
-
-        public String transactionId; // this is also the hash of the transaction.
-        public PublicKey sender; // senders address/public key.
-        public PublicKey reciepient; // Recipients address/public key.
-        public float value;
-        public byte[] signature; // this is to prevent anybody else from spending funds in our wallet.
-
-        public ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
-        public ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
-
-        private int sequence = 0; // a rough count of how many transactions have been generated.
-
-        // Constructor:
-        public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
-            this.sender = from;
-            this.reciepient = to;
-            this.value = value;
-            this.inputs = inputs;
-        }
-
-        // This Calculates the transaction hash (which will be used as its Id)
-        private String calulateHash() {
-            sequence++; //increase the sequence to avoid 2 identical transactions having the same hash
-            return StringUtil.applySha256(
-                    StringUtil.getStringFromKey(sender) +
-                            StringUtil.getStringFromKey(reciepient) +
-                            Float.toString(value) + sequence
-            );
-        }
-    }
-
 
     //Applies ECDSA Signature and returns the result ( as bytes ).
     public static byte[] applyECDSASig(PrivateKey privateKey, String input) {
@@ -94,7 +62,7 @@ public class StringUtil {
             ecdsaVerify.initVerify(publicKey);
             ecdsaVerify.update(data.getBytes());
             return ecdsaVerify.verify(signature);
-        }catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -116,15 +84,15 @@ public class StringUtil {
     // In the end we should have only one element in the treeLayer ArrayList
     public static String getMerkleRoot(ArrayList<Transaction> transactions) {
         int count = transactions.size();
-        ArrayList<String> previousTreeLayer = new ArrayList<String>();
-        for(Transaction transaction : transactions) {
+        ArrayList<String> previousTreeLayer = new ArrayList<>();
+        for (Transaction transaction : transactions) {
             previousTreeLayer.add(transaction.transactionId);
         }
         ArrayList<String> treeLayer = previousTreeLayer;
-        while(count > 1) {
-            treeLayer = new ArrayList<String>();
-            for(int i=1; i < previousTreeLayer.size(); i++) {
-                treeLayer.add(applySha256(previousTreeLayer.get(i-1) + previousTreeLayer.get(i)));
+        while (count > 1) {
+            treeLayer = new ArrayList<>();
+            for (int i = 1; i < previousTreeLayer.size(); i++) {
+                treeLayer.add(applySha256(previousTreeLayer.get(i - 1) + previousTreeLayer.get(i)));
             }
             count = treeLayer.size();
             previousTreeLayer = treeLayer;

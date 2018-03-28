@@ -9,15 +9,15 @@ public class Transaction {
     public PublicKey sender; // senders address/public key.
     public PublicKey recipient; // Recipients address/public key.
     public float value;
-    public byte[] signature; // this is to prevent anybody else from spending funds in our wallet.
+    private byte[] signature; // this is to prevent anybody else from spending funds in our wallet.
 
-    public ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
-    public ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
+    public ArrayList<TransactionInput> inputs = new ArrayList<>();
+    public ArrayList<TransactionOutput> outputs = new ArrayList<>();
 
     private static int sequence = 0; // a rough count of how many transactions have been generated.
 
     // Constructor:
-    public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
+    Transaction(PublicKey from, PublicKey to, float value, ArrayList<TransactionInput> inputs) {
         this.sender = from;
         this.recipient = to;
         this.value = value;
@@ -46,7 +46,7 @@ public class Transaction {
         return StringUtil.verifyECDSASig(sender, data, signature);
     }
 
-    public class processTransaction {
+
 
         //Returns true if new transaction could be created.
         public boolean processTransaction() {
@@ -70,7 +70,7 @@ public class Transaction {
             //generate transaction outputs:
             float leftOver = getInputsValue() - value; //get value of inputs then the left over change:
             transactionId = calulateHash();
-            outputs.add(new TransactionOutput( this.reciepient, value,transactionId)); //send value to recipient
+            outputs.add(new TransactionOutput( this.recipient, value,transactionId)); //send value to recipient
             outputs.add(new TransactionOutput( this.sender, leftOver,transactionId)); //send the left over 'change' back to sender
 
             //add outputs to Unspent list
@@ -105,6 +105,6 @@ public class Transaction {
             }
             return total;
         }
-    }
+
 
 }
