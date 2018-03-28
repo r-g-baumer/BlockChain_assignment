@@ -19,7 +19,8 @@ public class NoobChain {
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>();
 
-    public static HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>(); //list of all unspent transactions.
+    //list of all unspent transactions.
+    public static HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
 
 
     public static Boolean isChainValid(){

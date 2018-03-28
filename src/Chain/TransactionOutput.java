@@ -2,6 +2,8 @@ package Chain;
 
 import java.security.PublicKey;
 
+// Transaction outputs basically show that an amount has been sent to a user (as a result of a transaction)
+
 public class TransactionOutput {
     public String id;
     public PublicKey recipient; //also known as the new owner of these coins.
